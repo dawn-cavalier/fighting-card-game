@@ -13,11 +13,32 @@ struct Card
     unsigned int evade;
 };
 
+/**
+ * @brief Shuffles the given deck.
+ *
+ * @param deck
+ */
+void shuffle(std::vector<Card> &deck)
+{
+    for (auto index = 0; index < deck.size(); index++)
+    {
+        int newPosition = index + (rand() % (deck.size() - index));
+        Card hold = deck.at(newPosition);
+        deck.at(newPosition) = deck.at(index);
+        deck.at(index) = hold;
+    }
+}
+
 int main()
 {
+    // TODO: Replace
+    srand(time(0));
+
     std::vector<Card> masterDeck = {};
-    std::vector<Card> drawPile = {};
-    std::vector<Card> discard = {};
+    std::vector<Card> drawZone = {};
+    std::vector<Card> discardZone = {};
+    std::vector<Card> handZone = {};
+    std::vector<Card> focusZone = {};
 
     // TODO: Move to a card list file
     Card block = {"Block", 0, 1, 0};
@@ -38,24 +59,76 @@ int main()
     masterDeck.push_back(bigPunch);
 
     // Start of Fight
-    drawPile = masterDeck;
+    drawZone = masterDeck;
     // Shuffle
-    // TODO: Replace
-    srand(time(0));
-    for (auto index = 0; index < drawPile.size(); index++)
+    shuffle(drawZone);
+
+    /// Start of turn
+    // Draw hand
+    for (auto i = 0; i < 5; i++)
     {
-        int newPosition = index + (rand() % (drawPile.size() - index));
-        Card hold = drawPile.at(newPosition);
-        drawPile.at(newPosition) = drawPile.at(index);
-        drawPile.at(index) = hold;
+        // Reshuffle if deck is draw pile
+        if (drawZone.empty())
+        {
+            drawZone = discardZone;
+            shuffle(drawZone);
+        }
+
+        // If draw pile is still empty, player doesn't draw anymore cards
+        if (drawZone.empty())
+        {
+            break;
+        }
+        handZone.push_back(drawZone.back());
+        drawZone.pop_back();
     }
-    
-    // TODO: Remove
-    // TEST DISPLAY START
-    for (auto card : drawPile)
+
+    // Inhale
+    // Could we make the inputs into an enum
+    std::string input = "";
+    int inputNum = -1;
+    std::cout << "Inhale Phase" << std::endl;
+    // This should be the game loop with a state machine inside it
+    while (true)
     {
-        std::cout << card.name << std::endl;
+        std::cout << "(" << 0 << "): " << "End Inhale Phase" << std::endl;
+        for (int i = 0; i < handZone.size(); i++)
+        {
+            std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
+        }
+
+        std::cin >> input;
+        try
+        {
+            std::size_t processedChars;
+            inputNum = std::stoi(input, &processedChars);
+            if (processedChars != input.length())
+            {
+                throw std::invalid_argument("String contains non-numeric characters after number.");
+            }
+        }
+        catch (const std::invalid_argument &e)
+        {
+            std::cerr << "Invalid Command!" << std::endl;
+        }
+        catch (...)
+        {
+            std::cerr << "Unknown Error." << std::endl;
+        }
+
+        if (inputNum == 0)
+        {
+            break;
+        }
+
+        std::cout << handZone.at(inputNum - 1).name << std::endl;
     }
-    // TEST DISPLAY END
+
+    // Exhale
+    std::cout << "Exhale Phase" << std::endl;
+    /// !Playing cards that are not charged discards them
+    // Discard
+    std::cout << "Discard Phase" << std::endl;
+
     return 0;
 }
