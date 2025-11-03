@@ -6,6 +6,7 @@ enum GameState
     FightTurnStart,
     FightInhale,
     FightExhale,
+    FightPlay,
     FightDiscard,
     FightTurnEnd
 };

@@ -32,34 +32,14 @@ void shuffle(std::vector<Card> &deck)
 }
 
 /**
- * @brief   Executes one interation of the inhalePhase and returns if the phase should end.
- * @details Presents the user options, takes in the user's input, casts it to an int,
- *          then moves the appropriate cards to the appropriate zones.
- *          Returns true if the user wishes to end the phase and false otherwise.
+ * @brief Request and converts user's input into a number.
  *
- * @param   handZone
- * @param   focusZone
- * @return  true
- * @return  false
+ * @return int
  */
-bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
+int pollUserInput()
 {
     std::string input = "";
     int inputNum = -1;
-
-    std::cout << "Focused Cards:" << std::endl;
-    for (int i = 0; i < focusZone.size(); i++)
-    {
-        std::cout << focusZone.at(i).name << std::endl;
-    }
-
-    std::cout << "Hand:" << std::endl;
-    std::cout << "(" << 0 << "): " << "End Inhale Phase" << std::endl;
-    for (int i = 0; i < handZone.size(); i++)
-    {
-        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
-    }
-
     std::cin >> input;
     try
     {
@@ -78,16 +58,138 @@ bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
     {
         std::cerr << "Unknown Error." << std::endl;
     }
+    return inputNum;
+}
+
+/**
+ * @brief   Executes one interation of the inhale phase and returns if the phase should end.
+ *
+ * @param   handZone
+ * @param   focusZone
+ * @return  true
+ * @return  false
+ */
+bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
+{
+    int inputNum = -1;
+
+    std::cout << "Focused Cards:" << std::endl;
+    for (int i = 0; i < focusZone.size(); i++)
+    {
+        std::cout << focusZone.at(i).name << std::endl;
+    }
+
+    std::cout << "Hand:" << std::endl;
+    std::cout << "(" << 0 << "): " << "End Inhale Phase" << std::endl;
+    for (int i = 0; i < handZone.size(); i++)
+    {
+        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
+    }
+
+    inputNum = pollUserInput();
     // User wishes to end the inhale phase, exit
     if (inputNum == 0)
     {
         return true;
     }
+
+    // Check if input is within range
+    if (inputNum < 0 || inputNum > handZone.size())
+    {
+        std::cerr << "Invalid input" << std::endl;
+        return false;
+    }
+
     // Undo padding for ease of use
     inputNum--;
+
     Card hold = handZone.at(inputNum);
     handZone.erase(handZone.begin() + inputNum);
     focusZone.push_back(hold);
+    return false;
+}
+/**
+ * @brief   Executes one interation of the exhale phase and returns if the phase should end.
+ *
+ * @param   handZone
+ * @param   focusZone
+ * @param   discardZone
+ * @return  true
+ * @return  false
+ */
+bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, std::vector<Card> &discardZone)
+{
+    int inputNum = -1;
+
+    std::cout << "Focused Cards:" << std::endl;
+    for (int i = 0; i < focusZone.size(); i++)
+    {
+        std::cout << focusZone.at(i).name << std::endl;
+    }
+
+    std::cout << "Hand:" << std::endl;
+    std::cout << "(" << 0 << "): " << "End Exhale Phase" << std::endl;
+    for (int i = 0; i < handZone.size(); i++)
+    {
+        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
+    }
+
+    inputNum = pollUserInput();
+
+    // User wishes to end the exhale phase, exit
+    if (inputNum == 0)
+    {
+        return true;
+    }
+
+    // Check if input is within range
+    if (inputNum < 0 || inputNum > handZone.size())
+    {
+        std::cerr << "Invalid input" << std::endl;
+        return false;
+    }
+
+    // Undo padding for ease of use
+    inputNum--;
+
+    Card hold = handZone.at(inputNum);
+    handZone.erase(handZone.begin() + inputNum);
+    discardZone.push_back(hold);
+    return false;
+}
+
+bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
+{
+    int inputNum = -1;
+
+    std::cout << "Focused Cards:" << std::endl;
+    std::cout << "(" << 0 << "): " << "End Exhale Phase" << std::endl;
+    for (int i = 0; i < focusZone.size(); i++)
+    {
+        std::cout << "(" << i + 1 << "): " << focusZone.at(i).name << std::endl;
+    }
+
+    inputNum = pollUserInput();
+
+    // User wishes to end the exhale phase, exit
+    if (inputNum == 0)
+    {
+        return true;
+    }
+
+    // Check if input is within range
+    if (inputNum < 0 || inputNum > focusZone.size())
+    {
+        std::cerr << "Invalid input" << std::endl;
+        return false;
+    }
+
+    // Undo padding for ease of use
+    inputNum--;
+
+    Card hold = focusZone.at(inputNum);
+    focusZone.erase(focusZone.begin() + inputNum);
+    discardZone.push_back(hold);
     return false;
 }
 
@@ -129,6 +231,9 @@ int main()
             masterDeck.push_back(bigPunch);
             state = FightStart;
             break;
+        case GameShutDown:
+            running = false;
+            break;
         case FightStart:
             drawZone = masterDeck;
             // Shuffle
@@ -159,10 +264,33 @@ int main()
         case FightInhale:
             if (inhaleIteration(handZone, focusZone))
             {
+                std::cout << "Exhale Phase" << std::endl;
                 state = FightExhale;
             };
             break;
-
+        case FightExhale:
+            if (exhaleIteration(handZone, focusZone, discardZone))
+            {
+                state = FightPlay;
+            }
+            break;
+        case FightPlay:
+            if (playIteration(focusZone, discardZone))
+            {
+                state = FightDiscard;
+            }
+            break;
+        case FightDiscard:
+            state = FightTurnEnd;
+            break;
+        case FightTurnEnd:
+            std::cout << "Press 0 to end fight" << std::endl;
+            if (pollUserInput() == 0)
+            {
+                state = GameShutDown;
+            }
+            state = FightTurnStart;
+            break;
         default:
             std::string msg = "ERROR: Entered recognized game state (";
             msg.append(std::to_string(state));
