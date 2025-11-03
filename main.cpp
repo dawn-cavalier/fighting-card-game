@@ -158,6 +158,14 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
     return false;
 }
 
+/**
+ * @brief Executes one interation of the play phase and returns if the phase should end.
+ * 
+ * @param focusZone 
+ * @param discardZone 
+ * @return true 
+ * @return false 
+ */
 bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
 {
     int inputNum = -1;
@@ -247,6 +255,7 @@ int main()
                 if (drawZone.empty())
                 {
                     drawZone = discardZone;
+                    discardZone = {};
                     shuffle(drawZone);
                 }
 
