@@ -32,6 +32,32 @@ void shuffle(std::vector<Card> &deck)
 }
 
 /**
+ * @brief Draws a card from the deck into the hand and reshuffles the discard pile into the deck if necessary.
+ *
+ * @param handZone
+ * @param deckZone
+ * @param discardZone
+ */
+void drawCard(std::vector<Card> &handZone, std::vector<Card> &deckZone, std::vector<Card> &discardZone)
+{
+    // Reshuffle if deck is draw pile
+    if (deckZone.empty())
+    {
+        deckZone = discardZone;
+        discardZone = {};
+        shuffle(deckZone);
+    }
+
+    // If draw pile is still empty, player doesn't draw anymore cards
+    if (deckZone.empty())
+    {
+        return;
+    }
+    handZone.push_back(deckZone.back());
+    deckZone.pop_back();
+}
+
+/**
  * @brief Request and converts user's input into a number.
  *
  * @return int
@@ -160,11 +186,11 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
 
 /**
  * @brief Executes one interation of the play phase and returns if the phase should end.
- * 
- * @param focusZone 
- * @param discardZone 
- * @return true 
- * @return false 
+ *
+ * @param focusZone
+ * @param discardZone
+ * @return true
+ * @return false
  */
 bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
 {
@@ -207,7 +233,7 @@ int main()
     srand(time(0));
 
     std::vector<Card> masterDeck = {};
-    std::vector<Card> drawZone = {};
+    std::vector<Card> deckZone = {};
     std::vector<Card> discardZone = {};
     std::vector<Card> handZone = {};
     std::vector<Card> focusZone = {};
@@ -243,29 +269,15 @@ int main()
             running = false;
             break;
         case FightStart:
-            drawZone = masterDeck;
+            deckZone = masterDeck;
             // Shuffle
-            shuffle(drawZone);
+            shuffle(deckZone);
             state = FightTurnStart;
             break;
         case FightTurnStart:
             for (auto i = 0; i < 5; i++)
             {
-                // Reshuffle if deck is draw pile
-                if (drawZone.empty())
-                {
-                    drawZone = discardZone;
-                    discardZone = {};
-                    shuffle(drawZone);
-                }
-
-                // If draw pile is still empty, player doesn't draw anymore cards
-                if (drawZone.empty())
-                {
-                    break;
-                }
-                handZone.push_back(drawZone.back());
-                drawZone.pop_back();
+                drawCard(handZone, deckZone, discardZone);
             }
             std::cout << "Inhale Phase" << std::endl;
             state = FightInhale;
@@ -290,10 +302,15 @@ int main()
             }
             break;
         case FightDiscard:
+            for (Card card : handZone)
+            {
+                discardZone.push_back(card);
+            }
+            handZone = {};
             state = FightTurnEnd;
             break;
         case FightTurnEnd:
-            std::cout << "Press 0 to end fight" << std::endl;
+            std::cout << "Enter 0 to end fight" << std::endl;
             if (pollUserInput() == 0)
             {
                 state = GameShutDown;
