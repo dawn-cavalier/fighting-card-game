@@ -327,15 +327,4 @@ int main()
         }
     }
     return 0;
-    /// Start of turn
-    // Inhale
-    // This should be the game loop with a state machine inside it
-
-    // Exhale
-    std::cout << "Exhale Phase" << std::endl;
-    /// !Playing cards that are not charged discards them
-    // Discard
-    std::cout << "Discard Phase" << std::endl;
-
-    return 0;
 }
