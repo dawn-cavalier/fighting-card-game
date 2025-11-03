@@ -5,11 +5,29 @@
 // TODO: Replace with SDL Random
 #include <random>
 
-#include "./enums/GameState.enum.cpp"
+enum GameState
+{
+    GameSetUp = 0,
+    GameShutDown,
+    FightStart,
+    FightTurnStart,
+    FightInhale,
+    FightExhale,
+    FightPlay,
+    FightDiscard,
+    FightTurnEnd
+};
 
+enum CardColor
+{
+    Red,
+    Blue,
+    Green
+};
 struct Card
 {
     std::string name;
+
     unsigned int damage;
     unsigned int block;
     unsigned int evade;
@@ -20,16 +38,7 @@ struct Card
  *
  * @param   deck
  */
-void shuffle(std::vector<Card> &deck)
-{
-    for (auto index = 0; index < deck.size(); index++)
-    {
-        int newPosition = index + (rand() % (deck.size() - index));
-        Card hold = deck.at(newPosition);
-        deck.at(newPosition) = deck.at(index);
-        deck.at(index) = hold;
-    }
-}
+void shuffle(std::vector<Card> &deck);
 
 /**
  * @brief Draws a card from the deck into the hand and reshuffles the discard pile into the deck if necessary.
@@ -38,54 +47,14 @@ void shuffle(std::vector<Card> &deck)
  * @param deckZone
  * @param discardZone
  */
-void drawCard(std::vector<Card> &handZone, std::vector<Card> &deckZone, std::vector<Card> &discardZone)
-{
-    // Reshuffle if deck is draw pile
-    if (deckZone.empty())
-    {
-        deckZone = discardZone;
-        discardZone = {};
-        shuffle(deckZone);
-    }
-
-    // If draw pile is still empty, player doesn't draw anymore cards
-    if (deckZone.empty())
-    {
-        return;
-    }
-    handZone.push_back(deckZone.back());
-    deckZone.pop_back();
-}
+void drawCard(std::vector<Card> &handZone, std::vector<Card> &deckZone, std::vector<Card> &discardZone);
 
 /**
  * @brief Request and converts user's input into a number.
  *
  * @return int
  */
-int pollUserInput()
-{
-    std::string input = "";
-    int inputNum = -1;
-    std::cin >> input;
-    try
-    {
-        std::size_t processedChars;
-        inputNum = std::stoi(input, &processedChars);
-        if (processedChars != input.length())
-        {
-            throw std::invalid_argument("String contains non-numeric characters after number.");
-        }
-    }
-    catch (const std::invalid_argument &e)
-    {
-        std::cerr << "Invalid Command!" << std::endl;
-    }
-    catch (...)
-    {
-        std::cerr << "Unknown Error." << std::endl;
-    }
-    return inputNum;
-}
+int pollUserInput();
 
 /**
  * @brief   Executes one interation of the inhale phase and returns if the phase should end.
@@ -95,45 +64,8 @@ int pollUserInput()
  * @return  true
  * @return  false
  */
-bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
-{
-    int inputNum = -1;
+bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone);
 
-    std::cout << "Focused Cards:" << std::endl;
-    for (int i = 0; i < focusZone.size(); i++)
-    {
-        std::cout << focusZone.at(i).name << std::endl;
-    }
-
-    std::cout << "Hand:" << std::endl;
-    std::cout << "(" << 0 << "): " << "End Inhale Phase" << std::endl;
-    for (int i = 0; i < handZone.size(); i++)
-    {
-        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
-    }
-
-    inputNum = pollUserInput();
-    // User wishes to end the inhale phase, exit
-    if (inputNum == 0)
-    {
-        return true;
-    }
-
-    // Check if input is within range
-    if (inputNum < 0 || inputNum > handZone.size())
-    {
-        std::cerr << "Invalid input" << std::endl;
-        return false;
-    }
-
-    // Undo padding for ease of use
-    inputNum--;
-
-    Card hold = handZone.at(inputNum);
-    handZone.erase(handZone.begin() + inputNum);
-    focusZone.push_back(hold);
-    return false;
-}
 /**
  * @brief   Executes one interation of the exhale phase and returns if the phase should end.
  *
@@ -143,46 +75,7 @@ bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
  * @return  true
  * @return  false
  */
-bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, std::vector<Card> &discardZone)
-{
-    int inputNum = -1;
-
-    std::cout << "Focused Cards:" << std::endl;
-    for (int i = 0; i < focusZone.size(); i++)
-    {
-        std::cout << focusZone.at(i).name << std::endl;
-    }
-
-    std::cout << "Hand:" << std::endl;
-    std::cout << "(" << 0 << "): " << "End Exhale Phase" << std::endl;
-    for (int i = 0; i < handZone.size(); i++)
-    {
-        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
-    }
-
-    inputNum = pollUserInput();
-
-    // User wishes to end the exhale phase, exit
-    if (inputNum == 0)
-    {
-        return true;
-    }
-
-    // Check if input is within range
-    if (inputNum < 0 || inputNum > handZone.size())
-    {
-        std::cerr << "Invalid input" << std::endl;
-        return false;
-    }
-
-    // Undo padding for ease of use
-    inputNum--;
-
-    Card hold = handZone.at(inputNum);
-    handZone.erase(handZone.begin() + inputNum);
-    discardZone.push_back(hold);
-    return false;
-}
+bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, std::vector<Card> &discardZone);
 
 /**
  * @brief Executes one interation of the play phase and returns if the phase should end.
@@ -192,40 +85,7 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
  * @return true
  * @return false
  */
-bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
-{
-    int inputNum = -1;
-
-    std::cout << "Focused Cards:" << std::endl;
-    std::cout << "(" << 0 << "): " << "End Exhale Phase" << std::endl;
-    for (int i = 0; i < focusZone.size(); i++)
-    {
-        std::cout << "(" << i + 1 << "): " << focusZone.at(i).name << std::endl;
-    }
-
-    inputNum = pollUserInput();
-
-    // User wishes to end the exhale phase, exit
-    if (inputNum == 0)
-    {
-        return true;
-    }
-
-    // Check if input is within range
-    if (inputNum < 0 || inputNum > focusZone.size())
-    {
-        std::cerr << "Invalid input" << std::endl;
-        return false;
-    }
-
-    // Undo padding for ease of use
-    inputNum--;
-
-    Card hold = focusZone.at(inputNum);
-    focusZone.erase(focusZone.begin() + inputNum);
-    discardZone.push_back(hold);
-    return false;
-}
+bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone);
 
 int main()
 {
@@ -327,4 +187,175 @@ int main()
         }
     }
     return 0;
+}
+
+void shuffle(std::vector<Card> &deck)
+{
+    for (auto index = 0; index < deck.size(); index++)
+    {
+        int newPosition = index + (rand() % (deck.size() - index));
+        Card hold = deck.at(newPosition);
+        deck.at(newPosition) = deck.at(index);
+        deck.at(index) = hold;
+    }
+}
+
+void drawCard(std::vector<Card> &handZone, std::vector<Card> &deckZone, std::vector<Card> &discardZone)
+{
+    // Reshuffle if deck is draw pile
+    if (deckZone.empty())
+    {
+        deckZone = discardZone;
+        discardZone = {};
+        shuffle(deckZone);
+    }
+
+    // If draw pile is still empty, player doesn't draw anymore cards
+    if (deckZone.empty())
+    {
+        return;
+    }
+    handZone.push_back(deckZone.back());
+    deckZone.pop_back();
+}
+
+int pollUserInput()
+{
+    std::string input = "";
+    int inputNum = -1;
+    std::cin >> input;
+    try
+    {
+        std::size_t processedChars;
+        inputNum = std::stoi(input, &processedChars);
+        if (processedChars != input.length())
+        {
+            throw std::invalid_argument("String contains non-numeric characters after number.");
+        }
+    }
+    catch (const std::invalid_argument &e)
+    {
+        std::cerr << "Invalid Command!" << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "Unknown Error." << std::endl;
+    }
+    return inputNum;
+}
+
+bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
+{
+    int inputNum = -1;
+
+    std::cout << "Focused Cards:" << std::endl;
+    for (int i = 0; i < focusZone.size(); i++)
+    {
+        std::cout << focusZone.at(i).name << std::endl;
+    }
+
+    std::cout << "Hand:" << std::endl;
+    std::cout << "(" << 0 << "): " << "End Inhale Phase" << std::endl;
+    for (int i = 0; i < handZone.size(); i++)
+    {
+        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
+    }
+
+    inputNum = pollUserInput();
+    // User wishes to end the inhale phase, exit
+    if (inputNum == 0)
+    {
+        return true;
+    }
+
+    // Check if input is within range
+    if (inputNum < 0 || inputNum > handZone.size())
+    {
+        std::cerr << "Invalid input" << std::endl;
+        return false;
+    }
+
+    // Undo padding for ease of use
+    inputNum--;
+
+    Card hold = handZone.at(inputNum);
+    handZone.erase(handZone.begin() + inputNum);
+    focusZone.push_back(hold);
+    return false;
+}
+
+bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, std::vector<Card> &discardZone)
+{
+    int inputNum = -1;
+
+    std::cout << "Focused Cards:" << std::endl;
+    for (int i = 0; i < focusZone.size(); i++)
+    {
+        std::cout << focusZone.at(i).name << std::endl;
+    }
+
+    std::cout << "Hand:" << std::endl;
+    std::cout << "(" << 0 << "): " << "End Exhale Phase" << std::endl;
+    for (int i = 0; i < handZone.size(); i++)
+    {
+        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
+    }
+
+    inputNum = pollUserInput();
+
+    // User wishes to end the exhale phase, exit
+    if (inputNum == 0)
+    {
+        return true;
+    }
+
+    // Check if input is within range
+    if (inputNum < 0 || inputNum > handZone.size())
+    {
+        std::cerr << "Invalid input" << std::endl;
+        return false;
+    }
+
+    // Undo padding for ease of use
+    inputNum--;
+
+    Card hold = handZone.at(inputNum);
+    handZone.erase(handZone.begin() + inputNum);
+    discardZone.push_back(hold);
+    return false;
+}
+
+bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
+{
+    int inputNum = -1;
+
+    std::cout << "Focused Cards:" << std::endl;
+    std::cout << "(" << 0 << "): " << "End Exhale Phase" << std::endl;
+    for (int i = 0; i < focusZone.size(); i++)
+    {
+        std::cout << "(" << i + 1 << "): " << focusZone.at(i).name << std::endl;
+    }
+
+    inputNum = pollUserInput();
+
+    // User wishes to end the exhale phase, exit
+    if (inputNum == 0)
+    {
+        return true;
+    }
+
+    // Check if input is within range
+    if (inputNum < 0 || inputNum > focusZone.size())
+    {
+        std::cerr << "Invalid input" << std::endl;
+        return false;
+    }
+
+    // Undo padding for ease of use
+    inputNum--;
+
+    Card hold = focusZone.at(inputNum);
+    focusZone.erase(focusZone.begin() + inputNum);
+    discardZone.push_back(hold);
+    return false;
 }
