@@ -5,6 +5,8 @@
 // TODO: Replace with SDL Random
 #include <random>
 
+#include "./enums/GameState.enum.cpp"
+
 struct Card
 {
     std::string name;
@@ -14,9 +16,9 @@ struct Card
 };
 
 /**
- * @brief Shuffles the given deck.
+ * @brief   Shuffles the given deck.
  *
- * @param deck
+ * @param   deck
  */
 void shuffle(std::vector<Card> &deck)
 {
@@ -27,6 +29,66 @@ void shuffle(std::vector<Card> &deck)
         deck.at(newPosition) = deck.at(index);
         deck.at(index) = hold;
     }
+}
+
+/**
+ * @brief   Executes one interation of the inhalePhase and returns if the phase should end.
+ * @details Presents the user options, takes in the user's input, casts it to an int,
+ *          then moves the appropriate cards to the appropriate zones.
+ *          Returns true if the user wishes to end the phase and false otherwise.
+ *
+ * @param   handZone
+ * @param   focusZone
+ * @return  true
+ * @return  false
+ */
+bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
+{
+    std::string input = "";
+    int inputNum = -1;
+
+    std::cout << "Focused Cards:" << std::endl;
+    for (int i = 0; i < focusZone.size(); i++)
+    {
+        std::cout << focusZone.at(i).name << std::endl;
+    }
+
+    std::cout << "Hand:" << std::endl;
+    std::cout << "(" << 0 << "): " << "End Inhale Phase" << std::endl;
+    for (int i = 0; i < handZone.size(); i++)
+    {
+        std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
+    }
+
+    std::cin >> input;
+    try
+    {
+        std::size_t processedChars;
+        inputNum = std::stoi(input, &processedChars);
+        if (processedChars != input.length())
+        {
+            throw std::invalid_argument("String contains non-numeric characters after number.");
+        }
+    }
+    catch (const std::invalid_argument &e)
+    {
+        std::cerr << "Invalid Command!" << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "Unknown Error." << std::endl;
+    }
+    // User wishes to end the inhale phase, exit
+    if (inputNum == 0)
+    {
+        return true;
+    }
+    // Undo padding for ease of use
+    inputNum--;
+    Card hold = handZone.at(inputNum);
+    handZone.erase(handZone.begin() + inputNum);
+    focusZone.push_back(hold);
+    return false;
 }
 
 int main()
@@ -47,82 +109,73 @@ int main()
     Card punch = {"Punch", 1, 0, 0};
     Card bigPunch = {"Punch", 3, 0, 0};
 
-    // TODO: Move to build starter deck function
-    masterDeck.push_back(block);
-    masterDeck.push_back(block);
-    masterDeck.push_back(bash);
-    masterDeck.push_back(feint);
-    masterDeck.push_back(feint);
-    masterDeck.push_back(feint);
-    masterDeck.push_back(punch);
-    masterDeck.push_back(punch);
-    masterDeck.push_back(bigPunch);
-
-    // Start of Fight
-    drawZone = masterDeck;
-    // Shuffle
-    shuffle(drawZone);
-
-    /// Start of turn
-    // Draw hand
-    for (auto i = 0; i < 5; i++)
-    {
-        // Reshuffle if deck is draw pile
-        if (drawZone.empty())
-        {
-            drawZone = discardZone;
-            shuffle(drawZone);
-        }
-
-        // If draw pile is still empty, player doesn't draw anymore cards
-        if (drawZone.empty())
-        {
-            break;
-        }
-        handZone.push_back(drawZone.back());
-        drawZone.pop_back();
-    }
-
-    // Inhale
-    // Could we make the inputs into an enum
-    std::string input = "";
-    int inputNum = -1;
-    std::cout << "Inhale Phase" << std::endl;
-    // This should be the game loop with a state machine inside it
+    GameState state = GameSetUp;
+    // Start of Game Loop
+    bool running = true;
     while (true)
     {
-        std::cout << "(" << 0 << "): " << "End Inhale Phase" << std::endl;
-        for (int i = 0; i < handZone.size(); i++)
+        switch (state)
         {
-            std::cout << "(" << i + 1 << "): " << handZone.at(i).name << std::endl;
-        }
-
-        std::cin >> input;
-        try
-        {
-            std::size_t processedChars;
-            inputNum = std::stoi(input, &processedChars);
-            if (processedChars != input.length())
+        case GameSetUp:
+            // TODO: Move to build starter deck function
+            masterDeck.push_back(block);
+            masterDeck.push_back(block);
+            masterDeck.push_back(bash);
+            masterDeck.push_back(feint);
+            masterDeck.push_back(feint);
+            masterDeck.push_back(feint);
+            masterDeck.push_back(punch);
+            masterDeck.push_back(punch);
+            masterDeck.push_back(bigPunch);
+            state = FightStart;
+            break;
+        case FightStart:
+            drawZone = masterDeck;
+            // Shuffle
+            shuffle(drawZone);
+            state = FightTurnStart;
+            break;
+        case FightTurnStart:
+            for (auto i = 0; i < 5; i++)
             {
-                throw std::invalid_argument("String contains non-numeric characters after number.");
-            }
-        }
-        catch (const std::invalid_argument &e)
-        {
-            std::cerr << "Invalid Command!" << std::endl;
-        }
-        catch (...)
-        {
-            std::cerr << "Unknown Error." << std::endl;
-        }
+                // Reshuffle if deck is draw pile
+                if (drawZone.empty())
+                {
+                    drawZone = discardZone;
+                    shuffle(drawZone);
+                }
 
-        if (inputNum == 0)
-        {
+                // If draw pile is still empty, player doesn't draw anymore cards
+                if (drawZone.empty())
+                {
+                    break;
+                }
+                handZone.push_back(drawZone.back());
+                drawZone.pop_back();
+            }
+            std::cout << "Inhale Phase" << std::endl;
+            state = FightInhale;
+            break;
+        case FightInhale:
+            if (inhaleIteration(handZone, focusZone))
+            {
+                state = FightExhale;
+            };
+            break;
+
+        default:
+            std::string msg = "ERROR: Entered recognized game state (";
+            msg.append(std::to_string(state));
+            msg.append(").");
+            std::cerr << msg << std::endl;
+            throw std::logic_error(msg);
             break;
         }
-
-        std::cout << handZone.at(inputNum - 1).name << std::endl;
     }
+    return 0;
+    /// Start of turn
+    // Inhale
+    // This should be the game loop with a state machine inside it
 
     // Exhale
     std::cout << "Exhale Phase" << std::endl;
