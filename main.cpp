@@ -4,6 +4,7 @@
 
 // TODO: Replace with SDL Random
 #include <random>
+#include "./src/master-card-list.cpp"
 
 enum GameState
 {
@@ -16,21 +17,6 @@ enum GameState
     FightPlay,
     FightDiscard,
     FightTurnEnd
-};
-
-enum CardColor
-{
-    Red,
-    Blue,
-    Green
-};
-struct Card
-{
-    std::string name;
-
-    unsigned int damage;
-    unsigned int block;
-    unsigned int evade;
 };
 
 /**
@@ -98,13 +84,6 @@ int main()
     std::vector<Card> handZone = {};
     std::vector<Card> focusZone = {};
 
-    // TODO: Move to a card list file
-    Card block = {"Block", 0, 1, 0};
-    Card bash = {"Bash", 2, 1, 0};
-    Card feint = {"Feint", 0, 0, 1};
-    Card punch = {"Punch", 1, 0, 0};
-    Card bigPunch = {"Punch", 3, 0, 0};
-
     GameState state = GameSetUp;
     // Start of Game Loop
     bool running = true;
@@ -113,16 +92,16 @@ int main()
         switch (state)
         {
         case GameSetUp:
+            masterDeck = {};
             // TODO: Move to build starter deck function
-            masterDeck.push_back(block);
-            masterDeck.push_back(block);
-            masterDeck.push_back(bash);
-            masterDeck.push_back(feint);
-            masterDeck.push_back(feint);
-            masterDeck.push_back(feint);
-            masterDeck.push_back(punch);
-            masterDeck.push_back(punch);
-            masterDeck.push_back(bigPunch);
+            masterDeck.push_back(masterCardList.at(Block));
+            masterDeck.push_back(masterCardList.at(Block));
+            masterDeck.push_back(masterCardList.at(Bash));
+            masterDeck.push_back(masterCardList.at(Feint));
+            masterDeck.push_back(masterCardList.at(Feint));
+            masterDeck.push_back(masterCardList.at(Punch));
+            masterDeck.push_back(masterCardList.at(Punch));
+            masterDeck.push_back(masterCardList.at(BigPunch));
             state = FightStart;
             break;
         case GameShutDown:
@@ -170,11 +149,6 @@ int main()
             state = FightTurnEnd;
             break;
         case FightTurnEnd:
-            std::cout << "Enter 0 to end fight" << std::endl;
-            if (pollUserInput() == 0)
-            {
-                state = GameShutDown;
-            }
             state = FightTurnStart;
             break;
         default:
