@@ -4,9 +4,9 @@
 
 enum CardColor
 {
-    Red,
-    Blue,
-    Green
+    Red = 0,
+    Green = 1,
+    Blue = 2
 };
 
 enum CardName
@@ -21,16 +21,16 @@ enum CardName
 struct Card
 {
     std::string name;
-    std::vector<CardColor> cost;
+    std::vector<int> cost;
     CardColor cardColor;
     int damage;
     int block;
     int evade;
-    std::vector<CardColor> embuedColors = {};
+    std::vector<int> embuedColors = {0, 0, 0};
     bool isEmbued = false;
 
     Card(std::string name,
-         std::vector<CardColor> cost,
+         std::vector<int> cost,
          CardColor cardColor,
          int damage,
          int block,
@@ -47,9 +47,9 @@ struct Card
 
 std::map<CardName, Card> masterCardList =
     {
-        {Block, Card("Block", {Blue}, Blue, 0, 1, 0)},
-        {Bash, Card("Bash", {Red, Blue}, Blue, 2, 1, 0)},
-        {Feint, Card("Feint", {Green}, Green, 0, 0, 1)},
-        {Punch, Card("Punch", {Red}, Red, 1, 0, 0)},
-        {BigPunch, Card("Big Punch", {Red, Red}, Red, 3, 0, 0)},
+        {Block, Card("Block", {0, 0, 1}, Blue, 0, 1, 0)},
+        {Bash, Card("Bash", {1, 0, 1}, Blue, 2, 1, 0)},
+        {Feint, Card("Feint", {0, 1, 0}, Green, 0, 0, 1)},
+        {Punch, Card("Punch", {1, 0, 0}, Red, 1, 0, 0)},
+        {BigPunch, Card("Big Punch", {2, 0, 0}, Red, 3, 0, 0)},
 };

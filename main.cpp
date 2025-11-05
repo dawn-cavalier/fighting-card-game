@@ -267,38 +267,21 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
     for (int i = 0; i < focusZone.size(); i++)
     {
         auto currentCard = focusZone.at(i);
-        std::string imbluedMessage;
-        if (!currentCard.isEmbued)
+        std::string imbuedMessage = "";
+        if (currentCard.isEmbued)
         {
-            imbluedMessage = "(";
-            for (CardColor color : currentCard.embuedColors)
-            {
-                std::string colorString;
-                switch (color)
-                {
-                case Red:
-                    colorString = "Red";
-                    break;
-                case Blue:
-                    colorString = "Blue";
-                    break;
-                case Green:
-                    colorString = "Green";
-                    break;
-                default:
-                    colorString = "Error";
-                    break;
-                }
-                imbluedMessage = imbluedMessage.append(colorString);
-                imbluedMessage = imbluedMessage.append(",");
-            }
-            imbluedMessage = imbluedMessage.append(")");
+            imbuedMessage = "(Ready!) ";
         }
-        else
-        {
-            imbluedMessage = "(Ready!)";
-        }
-        std::cout << currentCard.name << ": " << imbluedMessage << std::endl;
+
+        imbuedMessage.append("(");
+        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(Red)));
+        imbuedMessage.append(", ");
+        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(Green)));
+        imbuedMessage.append(", ");
+        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(Blue)));
+        imbuedMessage.append(")");
+
+        std::cout << currentCard.name << ": " << imbuedMessage << std::endl;
     }
 
     std::cout << "Hand:" << std::endl;
@@ -339,14 +322,8 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
             continue;
         }
 
-        card.embuedColors.push_back(playedCard.cardColor);
-        std::sort(card.embuedColors.begin(), card.embuedColors.end());
-
-        for (CardColor imbueRequirement : card.cost)
-        {
-            
-        }
-        card.isEmbued = card.embuedColors == card.cost;
+        card.embuedColors.at(playedCard.cardColor)++;
+        card.isEmbued = card.embuedColors.at(Red) >= card.cost.at(Red) && card.embuedColors.at(Green) >= card.cost.at(Green) && card.embuedColors.at(Blue) >= card.cost.at(Blue);
     }
 
     return false;
@@ -360,39 +337,13 @@ bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
     std::cout << "(" << 0 << "): " << "End Exhale Phase" << std::endl;
     for (int i = 0; i < focusZone.size(); i++)
     {
-         auto currentCard = focusZone.at(i);
-        std::string imbluedMessage;
-        if (!currentCard.isEmbued)
+        auto currentCard = focusZone.at(i);
+        std::string imbuedMessage = "";
+        if (currentCard.isEmbued)
         {
-            imbluedMessage = "(";
-            for (CardColor color : currentCard.embuedColors)
-            {
-                std::string colorString;
-                switch (color)
-                {
-                case Red:
-                    colorString = "Red";
-                    break;
-                case Blue:
-                    colorString = "Blue";
-                    break;
-                case Green:
-                    colorString = "Green";
-                    break;
-                default:
-                    colorString = "Error";
-                    break;
-                }
-                imbluedMessage = imbluedMessage.append(colorString);
-                imbluedMessage = imbluedMessage.append(",");
-            }
-            imbluedMessage = imbluedMessage.append(")");
+            imbuedMessage = "(Ready!) ";
         }
-        else
-        {
-            imbluedMessage = "(Ready!)";
-        }
-        std::cout << "(" << i + 1 << "): " << currentCard.name << ": " << imbluedMessage << std::endl;
+        std::cout << "(" << i + 1 << "): " << currentCard.name << ": " << imbuedMessage << std::endl;
     }
 
     inputNum = pollUserInput();
@@ -413,8 +364,9 @@ bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
     // Undo padding for ease of use
     inputNum--;
 
-    Card hold = focusZone.at(inputNum);
+    Card playedCard = focusZone.at(inputNum);
     focusZone.erase(focusZone.begin() + inputNum);
-    discardZone.push_back(hold);
+    playedCard.embuedColors = {0, 0, 0};
+    discardZone.push_back(playedCard);
     return false;
 }
