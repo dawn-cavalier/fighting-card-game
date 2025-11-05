@@ -22,22 +22,23 @@ struct Card
 {
     std::string name;
     std::vector<CardColor> cost;
-    CardColor value;
+    CardColor cardColor;
     int damage;
     int block;
     int evade;
-    std::vector<CardColor> embued = {};
+    std::vector<CardColor> embuedColors = {};
+    bool isEmbued = false;
 
     Card(std::string name,
          std::vector<CardColor> cost,
-         CardColor value,
+         CardColor cardColor,
          int damage,
          int block,
          int evade)
     {
         this->name = name;
         this->cost = cost;
-        this->value = value;
+        this->cardColor = cardColor;
         this->damage = damage;
         this->block = block;
         this->evade = evade;
