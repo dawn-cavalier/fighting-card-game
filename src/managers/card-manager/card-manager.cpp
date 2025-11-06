@@ -3,7 +3,7 @@ CardManager::CardManager()
 {
 }
 
-CardManager *CardManager::getInstance()
+CardManager* CardManager::getInstance()
 {
     if (instancePtr == nullptr)
     {

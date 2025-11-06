@@ -1,21 +1,13 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "./managers/card-manager/card-manager.h"
 
 enum CardColor
 {
     Red = 0,
     Green = 1,
     Blue = 2
-};
-
-enum CardName
-{
-    Block,
-    Bash,
-    Feint,
-    Punch,
-    BigPunch
 };
 
 struct Card

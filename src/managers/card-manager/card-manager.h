@@ -2,6 +2,14 @@
 #define FCARD_CARDMANAGER_H_
 
 #include "../manager/manager.h"
+enum CardName
+{
+    Block,
+    Bash,
+    Feint,
+    Punch,
+    BigPunch
+};
 
 class CardManager : public Manager
 {
@@ -12,6 +20,7 @@ private:
 public:
     static CardManager *getInstance();
 
+    CardManager(const CardManager &other) = delete;
     ~CardManager();
 
     const void startUp() override;

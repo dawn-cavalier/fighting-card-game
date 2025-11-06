@@ -55,6 +55,7 @@
         "xutility": "cpp",
         "map": "cpp",
         "xstddef": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "cinttypes": "cpp"
     }
 }

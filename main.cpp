@@ -5,7 +5,10 @@
 // TODO: Replace with SDL Random
 #include <random>
 #include "./src/master-card-list.cpp"
+
 #include "./src/managers/card-manager/card-manager.h"
+// TODO: These should be linked automatically but for some reason they are not
+#include "./src/managers/card-manager/card-manager.cpp"
 
 enum GameState
 {
@@ -86,12 +89,13 @@ const void startUp();
  */
 const void shutDown();
 
-CardManager *CardManager::instancePtr = nullptr;
+CardManager* CardManager::instancePtr = nullptr;
 
-int main()
+int main(int argCount, char* argVariables[])
 {
+    // auto cardRef = CardManager::getInstance();
     // TODO: Replace
-    srand(time(0));
+    startUp();
 
     std::vector<Card> masterDeck = {};
     std::vector<Card> deckZone = {};
@@ -420,11 +424,12 @@ bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
 
 const void startUp()
 {
-    CardManager::getInstance()->startUp();   
+    srand(time(0));
+    CardManager::getInstance();   
 }
 
 const void shutDown()
 {
-    CardManager::getInstance()->shutDown();
+    // CardManager::getInstance()->shutDown();
     
 }
