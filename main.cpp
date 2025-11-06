@@ -25,25 +25,6 @@ enum GameState
 };
 
 /**
- * @brief   Shuffles the given deck.
- *
- * @param   deck
- */
-void shuffle(std::vector<CardManager::Card> *deck);
-
-/**
- * @brief Draws a card from the deck into the hand and reshuffles the discard pile into the deck if necessary.
- *
- * @param handZone
- * @param deckZone
- * @param discardZone
- */
-void drawCard(
-    std::vector<CardManager::Card> *handZone,
-    std::vector<CardManager::Card> *deckZone,
-    std::vector<CardManager::Card> *discardZone);
-
-/**
  * @brief Request and converts user's input into a number.
  *
  * @return int
@@ -127,31 +108,29 @@ int main(int argCount, char *argVariables[])
         switch (state)
         {
         case GameSetUp:
-            *masterDeck = {};
-            // TODO: Move to build starter deck function
-            masterDeck->push_back(masterCardList.at(cardRef->Block));
-            masterDeck->push_back(masterCardList.at(cardRef->Block));
-            masterDeck->push_back(masterCardList.at(cardRef->Bash));
-            masterDeck->push_back(masterCardList.at(cardRef->Feint));
-            masterDeck->push_back(masterCardList.at(cardRef->Feint));
-            masterDeck->push_back(masterCardList.at(cardRef->Punch));
-            masterDeck->push_back(masterCardList.at(cardRef->Punch));
-            masterDeck->push_back(masterCardList.at(cardRef->BigPunch));
+            playerRef->addCardsToMasterDeck(
+                {cardRef->Block,
+                 cardRef->Block,
+                 cardRef->Bash,
+                 cardRef->Feint,
+                 cardRef->Feint,
+                 cardRef->Feint,
+                 cardRef->Punch,
+                 cardRef->Punch,
+                 cardRef->BigPunch});
             state = FightStart;
             break;
         case GameShutDown:
             running = false;
             break;
         case FightStart:
-            *deckZone = *masterDeck;
-            // Shuffle
-            shuffle(deckZone);
+            playerRef->fightStart();
             state = FightTurnStart;
             break;
         case FightTurnStart:
             for (auto i = 0; i < 5; i++)
             {
-                drawCard(handZone, deckZone, discardZone);
+                playerRef->drawCard();
             }
             std::cout << "Inhale Phase" << std::endl;
             state = FightInhale;
@@ -196,36 +175,6 @@ int main(int argCount, char *argVariables[])
         }
     }
     return 0;
-}
-
-void shuffle(std::vector<CardManager::Card> *deck)
-{
-    for (auto index = 0; index < deck->size(); index++)
-    {
-        int newPosition = index + (rand() % (deck->size() - index));
-        CardManager::Card hold = deck->at(newPosition);
-        deck->at(newPosition) = deck->at(index);
-        deck->at(index) = hold;
-    }
-}
-
-void drawCard(std::vector<CardManager::Card> *handZone, std::vector<CardManager::Card> *deckZone, std::vector<CardManager::Card> *discardZone)
-{
-    // Reshuffle if deck is draw pile
-    if (deckZone->empty())
-    {
-        deckZone = discardZone;
-        discardZone = {};
-        shuffle(deckZone);
-    }
-
-    // If draw pile is still empty, player doesn't draw anymore cards
-    if (deckZone->empty())
-    {
-        return;
-    }
-    handZone->push_back(deckZone->back());
-    deckZone->pop_back();
 }
 
 int pollUserInput()

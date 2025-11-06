@@ -12,12 +12,16 @@ private:
     static PlayerManager *instancePtr;
     PlayerManager();
 
+    // Deck Zone
+    void shuffle();
 public:
     std::vector<CardManager::Card> masterDeck;
     std::vector<CardManager::Card> deckZone;
     std::vector<CardManager::Card> discardZone;
     std::vector<CardManager::Card> handZone;
     std::vector<CardManager::Card> focusZone;
+
+    CardManager *cardRef;
 
     static PlayerManager *getInstance();
 
@@ -26,5 +30,15 @@ public:
 
     void startUp() override;
     void shutDown() override;
+
+    // Master Deck
+    void addCardsToMasterDeck(std::vector<CardManager::CardName> cardsToAdd);
+    void addCardToMasterDeck(CardManager::CardName cardToAdd);
+
+    // Deck Zone
+    void fightStart();
+
+    // Hand Zone
+    void drawCard();
 };
 #endif

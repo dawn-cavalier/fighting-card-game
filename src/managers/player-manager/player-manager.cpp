@@ -4,6 +4,17 @@ PlayerManager::PlayerManager()
 {
 }
 
+void PlayerManager::shuffle()
+{
+    for (auto index = 0; index < deckZone.size(); index++)
+    {
+        int newPosition = index + (rand() % (deckZone.size() - index));
+        CardManager::Card hold = deckZone.at(newPosition);
+        deckZone.at(newPosition) = deckZone.at(index);
+        deckZone.at(index) = hold;
+    }
+}
+
 PlayerManager *PlayerManager::getInstance()
 {
     if (instancePtr == nullptr)
@@ -19,6 +30,8 @@ PlayerManager::~PlayerManager()
 
 void PlayerManager::startUp()
 {
+    cardRef = CardManager::getInstance();
+
     masterDeck = {};
     deckZone = {};
     discardZone = {};
@@ -28,4 +41,42 @@ void PlayerManager::startUp()
 
 void PlayerManager::shutDown()
 {
+}
+
+void PlayerManager::addCardsToMasterDeck(std::vector<CardManager::CardName> cardsToAdd)
+{
+    for (auto card : cardsToAdd)
+    {
+        addCardToMasterDeck(card);
+    }
+}
+
+void PlayerManager::addCardToMasterDeck(CardManager::CardName cardToAdd)
+{
+    masterDeck.push_back(cardRef->masterCardList.at(cardToAdd));
+}
+
+void PlayerManager::fightStart()
+{
+    deckZone = masterDeck;
+    shuffle();
+}
+
+void PlayerManager::drawCard()
+{
+        // Reshuffle if deck is draw pile
+    if (deckZone.empty())
+    {
+        deckZone = discardZone;
+        discardZone = {};
+        shuffle();
+    }
+
+    // If draw pile is still empty, player doesn't draw anymore cards
+    if (deckZone.empty())
+    {
+        return;
+    }
+    handZone.push_back(deckZone.back());
+    deckZone.pop_back();
 }
