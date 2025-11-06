@@ -4,7 +4,6 @@
 
 // TODO: Replace with SDL Random
 #include <random>
-#include "./src/master-card-list.cpp"
 
 #include "./src/managers/card-manager/card-manager.h"
 // TODO: These should be linked automatically but for some reason they are not
@@ -28,7 +27,7 @@ enum GameState
  *
  * @param   deck
  */
-void shuffle(std::vector<Card> &deck);
+void shuffle(std::vector<CardManager::Card> &deck);
 
 /**
  * @brief Draws a card from the deck into the hand and reshuffles the discard pile into the deck if necessary.
@@ -37,7 +36,7 @@ void shuffle(std::vector<Card> &deck);
  * @param deckZone
  * @param discardZone
  */
-void drawCard(std::vector<Card> &handZone, std::vector<Card> &deckZone, std::vector<Card> &discardZone);
+void drawCard(std::vector<CardManager::Card> &handZone, std::vector<CardManager::Card> &deckZone, std::vector<CardManager::Card> &discardZone);
 
 /**
  * @brief Request and converts user's input into a number.
@@ -54,7 +53,7 @@ int pollUserInput();
  * @return  true
  * @return  false
  */
-bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone);
+bool inhaleIteration(std::vector<CardManager::Card> &handZone, std::vector<CardManager::Card> &focusZone);
 
 /**
  * @brief   Executes one interation of the exhale phase and returns if the phase should end.
@@ -65,7 +64,7 @@ bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone);
  * @return  true
  * @return  false
  */
-bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, std::vector<Card> &discardZone);
+bool exhaleIteration(std::vector<CardManager::Card> &handZone, std::vector<CardManager::Card> &focusZone, std::vector<CardManager::Card> &discardZone);
 
 /**
  * @brief Executes one interation of the play phase and returns if the phase should end.
@@ -75,7 +74,7 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
  * @return true
  * @return false
  */
-bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone);
+bool playIteration(std::vector<CardManager::Card> &focusZone, std::vector<CardManager::Card> &discardZone);
 
 /**
  * @brief Intializes all Managers
@@ -89,21 +88,24 @@ const void startUp();
  */
 const void shutDown();
 
-CardManager* CardManager::instancePtr = nullptr;
+CardManager *CardManager::instancePtr = nullptr;
 
-int main(int argCount, char* argVariables[])
+int main(int argCount, char *argVariables[])
 {
-    // auto cardRef = CardManager::getInstance();
     // TODO: Replace
     startUp();
+    auto cardRef = CardManager::getInstance();
 
-    std::vector<Card> masterDeck = {};
-    std::vector<Card> deckZone = {};
-    std::vector<Card> discardZone = {};
-    std::vector<Card> handZone = {};
-    std::vector<Card> focusZone = {};
+    std::vector<CardManager::Card> masterDeck = {};
+    std::vector<CardManager::Card> deckZone = {};
+    std::vector<CardManager::Card> discardZone = {};
+    std::vector<CardManager::Card> handZone = {};
+    std::vector<CardManager::Card> focusZone = {};
 
     GameState state = GameSetUp;
+
+    auto masterCardList = cardRef->masterCardList;
+
     // Start of Game Loop
     bool running = true;
     while (true)
@@ -113,14 +115,14 @@ int main(int argCount, char* argVariables[])
         case GameSetUp:
             masterDeck = {};
             // TODO: Move to build starter deck function
-            masterDeck.push_back(masterCardList.at(Block));
-            masterDeck.push_back(masterCardList.at(Block));
-            masterDeck.push_back(masterCardList.at(Bash));
-            masterDeck.push_back(masterCardList.at(Feint));
-            masterDeck.push_back(masterCardList.at(Feint));
-            masterDeck.push_back(masterCardList.at(Punch));
-            masterDeck.push_back(masterCardList.at(Punch));
-            masterDeck.push_back(masterCardList.at(BigPunch));
+            masterDeck.push_back(masterCardList.at(cardRef->Block));
+            masterDeck.push_back(masterCardList.at(cardRef->Block));
+            masterDeck.push_back(masterCardList.at(cardRef->Bash));
+            masterDeck.push_back(masterCardList.at(cardRef->Feint));
+            masterDeck.push_back(masterCardList.at(cardRef->Feint));
+            masterDeck.push_back(masterCardList.at(cardRef->Punch));
+            masterDeck.push_back(masterCardList.at(cardRef->Punch));
+            masterDeck.push_back(masterCardList.at(cardRef->BigPunch));
             state = FightStart;
             break;
         case GameShutDown:
@@ -160,7 +162,7 @@ int main(int argCount, char* argVariables[])
             }
             break;
         case FightDiscard:
-            for (Card card : handZone)
+            for (CardManager::Card card : handZone)
             {
                 discardZone.push_back(card);
             }
@@ -182,18 +184,18 @@ int main(int argCount, char* argVariables[])
     return 0;
 }
 
-void shuffle(std::vector<Card> &deck)
+void shuffle(std::vector<CardManager::Card> &deck)
 {
     for (auto index = 0; index < deck.size(); index++)
     {
         int newPosition = index + (rand() % (deck.size() - index));
-        Card hold = deck.at(newPosition);
+        CardManager::Card hold = deck.at(newPosition);
         deck.at(newPosition) = deck.at(index);
         deck.at(index) = hold;
     }
 }
 
-void drawCard(std::vector<Card> &handZone, std::vector<Card> &deckZone, std::vector<Card> &discardZone)
+void drawCard(std::vector<CardManager::Card> &handZone, std::vector<CardManager::Card> &deckZone, std::vector<CardManager::Card> &discardZone)
 {
     // Reshuffle if deck is draw pile
     if (deckZone.empty())
@@ -238,7 +240,7 @@ int pollUserInput()
     return inputNum;
 }
 
-bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
+bool inhaleIteration(std::vector<CardManager::Card> &handZone, std::vector<CardManager::Card> &focusZone)
 {
     int inputNum = -1;
 
@@ -272,13 +274,13 @@ bool inhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone)
     // Undo padding for ease of use
     inputNum--;
 
-    Card hold = handZone.at(inputNum);
+    CardManager::Card hold = handZone.at(inputNum);
     handZone.erase(handZone.begin() + inputNum);
     focusZone.push_back(hold);
     return false;
 }
 
-bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, std::vector<Card> &discardZone)
+bool exhaleIteration(std::vector<CardManager::Card> &handZone, std::vector<CardManager::Card> &focusZone, std::vector<CardManager::Card> &discardZone)
 {
     int inputNum = -1;
 
@@ -289,17 +291,17 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
         std::string imbuedMessage = "";
 
         imbuedMessage.append("(");
-        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(Red)));
+        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(CardManager::Red)));
         imbuedMessage.append("/");
-        imbuedMessage.append(std::to_string(currentCard.cost.at(Red)));
+        imbuedMessage.append(std::to_string(currentCard.cost.at(CardManager::Red)));
         imbuedMessage.append(", ");
-        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(Green)));
+        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(CardManager::Green)));
         imbuedMessage.append("/");
-        imbuedMessage.append(std::to_string(currentCard.cost.at(Green)));
+        imbuedMessage.append(std::to_string(currentCard.cost.at(CardManager::Green)));
         imbuedMessage.append(", ");
-        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(Blue)));
+        imbuedMessage.append(std::to_string(currentCard.embuedColors.at(CardManager::Blue)));
         imbuedMessage.append("/");
-        imbuedMessage.append(std::to_string(currentCard.cost.at(Blue)));
+        imbuedMessage.append(std::to_string(currentCard.cost.at(CardManager::Blue)));
         imbuedMessage.append(")");
 
         if (currentCard.isEmbued)
@@ -325,13 +327,13 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
         message.append("<");
         switch (currentCard.cardColor)
         {
-        case Red:
+        case CardManager::Red:
             message.append("Red");
             break;
-        case Green:
+        case CardManager::Green:
             message.append("Green");
             break;
-        case Blue:
+        case CardManager::Blue:
             message.append("Blue");
             break;
         default:
@@ -360,11 +362,11 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
     inputNum--;
 
     // Playing the Card and Imbuing the focused cards
-    Card playedCard = handZone.at(inputNum);
+    CardManager::Card playedCard = handZone.at(inputNum);
     handZone.erase(handZone.begin() + inputNum);
     discardZone.push_back(playedCard);
 
-    for (Card &card : focusZone)
+    for (CardManager::Card &card : focusZone)
     {
         // If full embued skip
         if (card.isEmbued)
@@ -373,13 +375,16 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
         }
 
         card.embuedColors.at(playedCard.cardColor)++;
-        card.isEmbued = card.embuedColors.at(Red) >= card.cost.at(Red) && card.embuedColors.at(Green) >= card.cost.at(Green) && card.embuedColors.at(Blue) >= card.cost.at(Blue);
+        card.isEmbued =
+            card.embuedColors.at(CardManager::Red) >= card.cost.at(CardManager::Red) &&
+            card.embuedColors.at(CardManager::Green) >= card.cost.at(CardManager::Green) &&
+            card.embuedColors.at(CardManager::Blue) >= card.cost.at(CardManager::Blue);
     }
 
     return false;
 }
 
-bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
+bool playIteration(std::vector<CardManager::Card> &focusZone, std::vector<CardManager::Card> &discardZone)
 {
     int inputNum = -1;
 
@@ -414,7 +419,7 @@ bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
     // Undo padding for ease of use
     inputNum--;
 
-    Card playedCard = focusZone.at(inputNum);
+    CardManager::Card playedCard = focusZone.at(inputNum);
     focusZone.erase(focusZone.begin() + inputNum);
     playedCard.embuedColors = {0, 0, 0};
     playedCard.isEmbued = false;
@@ -425,11 +430,10 @@ bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
 const void startUp()
 {
     srand(time(0));
-    CardManager::getInstance();   
+    CardManager::getInstance()->startUp();
 }
 
 const void shutDown()
 {
-    // CardManager::getInstance()->shutDown();
-    
+    CardManager::getInstance()->shutDown();
 }
