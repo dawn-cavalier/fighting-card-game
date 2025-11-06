@@ -64,7 +64,7 @@ public:
     CardManager(const CardManager &other) = delete;
     ~CardManager();
 
-    const void startUp() override;
-    const void shutDown() override;
+    void startUp() override;
+    void shutDown() override;
 };
 #endif

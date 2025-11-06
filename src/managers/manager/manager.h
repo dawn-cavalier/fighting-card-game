@@ -9,9 +9,8 @@ class Manager
 {
 private:
 public:
-
-	virtual const void startUp() = 0;
-	virtual const void shutDown() = 0;
+	virtual void startUp() = 0;
+	virtual void shutDown() = 0;
 };
 
 #endif

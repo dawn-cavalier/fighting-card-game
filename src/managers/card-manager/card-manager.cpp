@@ -16,7 +16,7 @@ CardManager::~CardManager()
 {
 }
 
-const void CardManager::startUp()
+void CardManager::startUp()
 {
     masterCardList =
         {
@@ -28,6 +28,6 @@ const void CardManager::startUp()
         };
 }
 
-const void CardManager::shutDown()
+void CardManager::shutDown()
 {
 }
