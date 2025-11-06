@@ -128,10 +128,7 @@ int main(int argCount, char *argVariables[])
             state = FightTurnStart;
             break;
         case FightTurnStart:
-            for (auto i = 0; i < 5; i++)
-            {
-                playerRef->drawCard();
-            }
+            playerRef->drawCards(5);
             std::cout << "Inhale Phase" << std::endl;
             state = FightInhale;
             break;
@@ -155,11 +152,7 @@ int main(int argCount, char *argVariables[])
             }
             break;
         case FightDiscard:
-            for (CardManager::Card card : *handZone)
-            {
-                discardZone->push_back(card);
-            }
-            *handZone = {};
+            playerRef->moveToDiscard();
             state = FightTurnEnd;
             break;
         case FightTurnEnd:

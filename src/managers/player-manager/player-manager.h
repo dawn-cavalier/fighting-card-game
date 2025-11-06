@@ -40,5 +40,7 @@ public:
 
     // Hand Zone
     void drawCard();
+    void drawCards(int num);
+    void moveToDiscard();
 };
 #endif

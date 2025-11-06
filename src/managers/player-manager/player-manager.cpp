@@ -64,7 +64,7 @@ void PlayerManager::fightStart()
 
 void PlayerManager::drawCard()
 {
-        // Reshuffle if deck is draw pile
+    // Reshuffle if deck is draw pile
     if (deckZone.empty())
     {
         deckZone = discardZone;
@@ -79,4 +79,25 @@ void PlayerManager::drawCard()
     }
     handZone.push_back(deckZone.back());
     deckZone.pop_back();
+}
+
+void PlayerManager::drawCards(int num)
+{
+    for (int i = 0; i < num; i++)
+    {
+        drawCard();
+    }
+}
+
+void PlayerManager::moveToDiscard()
+{
+    int initialSize = handZone.size();
+    int removedCards = 0;
+    for (int i = 0; i < initialSize; i++)
+    {
+        int targetIndex = i - removedCards;
+        discardZone.push_back(handZone.at(targetIndex));
+        handZone.erase(handZone.begin() + targetIndex);
+        removedCards++;
+    }
 }
