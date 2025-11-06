@@ -5,6 +5,7 @@
 // TODO: Replace with SDL Random
 #include <random>
 #include "./src/master-card-list.cpp"
+#include "./src/managers/card-manager/card-manager.h"
 
 enum GameState
 {
@@ -72,6 +73,20 @@ bool exhaleIteration(std::vector<Card> &handZone, std::vector<Card> &focusZone, 
  * @return false
  */
 bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone);
+
+/**
+ * @brief Intializes all Managers
+ *
+ */
+const void startUp();
+
+/**
+ * @brief Cleans up all Managers
+ *
+ */
+const void shutDown();
+
+CardManager *CardManager::instancePtr = nullptr;
 
 int main()
 {
@@ -398,6 +413,18 @@ bool playIteration(std::vector<Card> &focusZone, std::vector<Card> &discardZone)
     Card playedCard = focusZone.at(inputNum);
     focusZone.erase(focusZone.begin() + inputNum);
     playedCard.embuedColors = {0, 0, 0};
+    playedCard.isEmbued = false;
     discardZone.push_back(playedCard);
     return false;
+}
+
+const void startUp()
+{
+    CardManager::getInstance()->startUp();   
+}
+
+const void shutDown()
+{
+    CardManager::getInstance()->shutDown();
+    
 }
