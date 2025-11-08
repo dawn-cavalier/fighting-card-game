@@ -1,10 +1,6 @@
-#include "./src/managers/card-manager/card-manager.h"
-#include "./src/managers/player-manager/player-manager.h"
-#include "./src/managers/game-state-manager/game-state-manager.h"
-// TODO: These should be linked automatically but for some reason they are not
-#include "./src/managers/card-manager/card-manager.cpp"
-#include "./src/managers/player-manager/player-manager.cpp"
-#include "./src/managers/game-state-manager/game-state-manager.cpp"
+#include "./managers/card-manager/card-manager.h"
+#include "./managers/player-manager/player-manager.h"
+#include "./managers/game-state-manager/game-state-manager.h"
 
 /**
  * @brief Intializes all Managers
@@ -22,7 +18,7 @@ CardManager *CardManager::instancePtr = nullptr;
 PlayerManager *PlayerManager::instancePtr = nullptr;
 GameStateManager *GameStateManager::instancePtr = nullptr;
 
-int main(int argCount, char *argVariables[])
+int main()
 {
     // TODO: Replace
     startUp();
