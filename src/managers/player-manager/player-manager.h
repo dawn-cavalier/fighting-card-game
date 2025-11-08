@@ -21,7 +21,7 @@ public:
     std::vector<CardManager::Card> handZone;
     std::vector<CardManager::Card> focusZone;
 
-    CardManager *cardRef;
+    CardManager *cardRef = nullptr;
 
     static PlayerManager *getInstance();
 
