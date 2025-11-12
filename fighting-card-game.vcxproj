@@ -124,12 +124,14 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\managers\card-manager\card-manager.cpp" />
+    <ClCompile Include="src\managers\control-manager\control-manager.cpp" />
     <ClCompile Include="src\managers\game-state-manager\game-state-manager.cpp" />
     <ClCompile Include="src\managers\manager\manager.cpp" />
     <ClCompile Include="src\managers\player-manager\player-manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\managers\card-manager\card-manager.h" />
+    <ClInclude Include="src\managers\control-manager\control-manager.h" />
     <ClInclude Include="src\managers\game-state-manager\game-state-manager.h" />
     <ClInclude Include="src\managers\manager\manager.h" />
     <ClInclude Include="src\managers\player-manager\player-manager.h" />
