@@ -6,6 +6,7 @@
 
 #include "../manager/manager.h"
 #include "../player-manager/player-manager.h"
+#include "../control-manager/control-manager.h"
 
 class GameStateManager : public Manager
 {

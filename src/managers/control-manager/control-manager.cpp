@@ -2,8 +2,7 @@
 
 ControlManager::ControlManager() 
 {
-    mouseAbsoluteX = new float(0);
-    mouseAbsoluteY = new float(0);
+    keyState = SDL_GetKeyboardState(numkeys);
 }
 
 ControlManager* ControlManager::getInstance()
@@ -21,20 +20,27 @@ ControlManager::~ControlManager()
 
 void ControlManager::startUp()
 {
-    mouseAbsoluteX = new float(0);
-    mouseAbsoluteY = new float(0);
 }
 
 void ControlManager::shutDown()
 {
 }
 
-void ControlManager::getMouseInfo()
+SDL_MouseButtonFlags ControlManager::getMouseButtons()
 {
-    const SDL_MouseButtonFlags buttonFlags = SDL_GetMouseState(mouseAbsoluteX, mouseAbsoluteY);
+    return SDL_GetMouseState(nullptr, nullptr);
 }
 
 MousePoint ControlManager::getMousePosition()
 {
+    float* mouseAbsoluteX = new float(0);
+    float* mouseAbsoluteY = new float(0);
+
+    SDL_GetMouseState(mouseAbsoluteX, mouseAbsoluteY);
     return MousePoint(*mouseAbsoluteX, *mouseAbsoluteY);
+}
+
+bool ControlManager::getKeyboardCommandState(KeyboardGameCommands command)
+{
+    return keyState[keybinds.at(command)];
 }

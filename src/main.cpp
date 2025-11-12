@@ -11,16 +11,16 @@
 #include "./managers/control-manager/control-manager.h"
 
 /**
- * @brief Intializes all Managers
+ * @brief Intializes all managers
  *
  */
-const void startUp();
+const void managerStartUp();
 
 /**
- * @brief Cleans up all Managers
+ * @brief Cleans up all managers
  *
  */
-const void shutDown();
+const void managerShutDown();
 
 const void printUnrecongizedInput(uint32_t event);
 
@@ -32,6 +32,7 @@ ControlManager* ControlManager::instancePtr = nullptr;
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
+
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -50,7 +51,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     }
     SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    startUp();
+    managerStartUp();
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
@@ -64,8 +65,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     case SDL_EVENT_QUIT:
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     case SDL_EVENT_MOUSE_MOTION:
-        ControlManager::getInstance()->getMouseInfo();
-        SDL_Log("(%.2f, %.2f)", mousePos.x, mousePos.y);
+        //SDL_Log("(%.2f, %.2f)", mousePos.x, mousePos.y);
+        break;
+    case SDL_EVENT_KEY_DOWN:
+        SDL_Log("%d: %d", END_TURN, ControlManager::getInstance()->getKeyboardCommandState(END_TURN));
         break;
     default:
         printUnrecongizedInput(event->type);
@@ -97,7 +100,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
     /* SDL will clean up the window/renderer for us. */
-    shutDown();
+    managerShutDown();
 }
 
 //int main(int argc, char* argv[])
@@ -111,7 +114,7 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result)
 //    return 0;
 //}
 
-const void startUp()
+const void managerStartUp()
 {
     // TODO: Replace with SDL
     srand(time(0));
@@ -123,7 +126,7 @@ const void startUp()
 
 }
 
-const void shutDown()
+const void managerShutDown()
 {
     GameStateManager::getInstance()->shutDown();
     PlayerManager::getInstance()->shutDown();
